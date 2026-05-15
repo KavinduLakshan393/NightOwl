@@ -1,11 +1,61 @@
-import React from 'react';
+
+import { useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import usePDFStore from '../store/pdfStore';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const setCurrentFile = usePDFStore((state) => state.setCurrentFile);
+  const fileInputRef = useRef(null);
+
+  const handleFile = useCallback((file) => {
+    if (file && file.type === 'application/pdf') {
+      const fileUrl = URL.createObjectURL(file);
+      setCurrentFile(fileUrl, file.name);
+      navigate('/viewer');
+    } else {
+      alert('Please select a valid PDF file.');
+    }
+  }, [setCurrentFile, navigate]);
+
+  const handleDrop = useCallback((e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    handleFile(file);
+  }, [handleFile]);
+
+  const handleDragOver = useCallback((e) => {
+    e.preventDefault();
+  }, []);
+
+  const handleClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleInputChange = (e) => {
+    const file = e.target.files[0];
+    handleFile(file);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <h1 className="text-4xl font-heading font-bold mb-8">NightOwl Library</h1>
-      <div className="w-full max-w-2xl h-64 border-2 border-dashed border-slate-600 rounded-xl flex items-center justify-center hover:bg-slate-800 transition-colors cursor-pointer group">
-        <div className="text-center">
+
+      <input
+        type="file"
+        accept="application/pdf"
+        className="hidden"
+        ref={fileInputRef}
+        onChange={handleInputChange}
+      />
+
+      <div
+        onClick={handleClick}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        className="w-full max-w-2xl h-64 border-2 border-dashed border-slate-600 rounded-xl flex items-center justify-center hover:bg-slate-800 transition-colors cursor-pointer group"
+      >
+        <div className="text-center pointer-events-none">
           <p className="text-slate-400 group-hover:text-slate-200">Drag and drop your PDF here</p>
           <p className="text-sm text-slate-500 mt-2">or click to browse</p>
         </div>

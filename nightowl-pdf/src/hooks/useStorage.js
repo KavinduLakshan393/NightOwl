@@ -1,4 +1,4 @@
-import { useLiveQuery } from 'dexie-react-hooks';
+
 
 // Placeholder for Dexie DB initialization
 // import db from '../utils/db';
